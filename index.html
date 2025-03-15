@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[EELANT_PORTFOLIO] v9.6 - Backend & DevOps</title>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for Light/Dark Mode */
+        :root {
+            /* Light Mode (default) */
+            --bg-color: #f0f0f0;
+            --text-color: #000000;
+            --secondary-text-color: #333333;
+            --shadow-color: rgba(0, 0, 0, 0.4);
+            --card-bg: rgba(230, 230, 230, 0.9);
+            --nav-bg: rgba(240, 240, 240, 0.9);
+            --border-color: rgba(0, 0, 0, 0.3);
+            --skill-card-bg: rgba(0, 0, 0, 0.1);
+            --skill-card-hover-bg: #000000;
+            --skill-card-hover-text: #ffffff;
+            --popup-bg: #e0e0e0;
+            --popup-details-bg: rgba(0, 0, 0, 0.1);
+            --overlay-bg: rgba(0, 0, 0, 0.7);
+        }
+
+        /* Dark Mode (Backend/DevOps Cyberpunk Feel) */
+        [data-theme="dark"] {
+            --bg-color: #0d0d0d;
+            --text-color: #00ffcc;
+            --secondary-text-color: #99ccff;
+            --shadow-color: rgba(0, 255, 204, 0.4);
+            --card-bg: rgba(20, 20, 20, 0.9);
+            --nav-bg: rgba(15, 15, 15, 0.9);
+            --border-color: rgba(0, 255, 204, 0.3);
+            --skill-card-bg: rgba(0, 255, 204, 0.05);
+            --skill-card-hover-bg: #00ffcc;
+            --skill-card-hover-text: #000000;
+            --popup-bg: #1a1a1a;
+            --popup-details-bg: rgba(0, 255, 204, 0.05);
+            --overlay-bg: rgba(0, 0, 0, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'IBM Plex Mono', monospace;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        canvas {
+            position: fixed; /* Fixed to prevent scrolling */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+            filter: blur(0.5px);
+            /* Removed will-change: transform since no transform is applied */
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 10;
+        }
+
+        nav h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: var(--text-color);
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--shadow-color);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+            align-items: center;
+        }
+
+        nav a {
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            font-size: 0.95em;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--text-color);
+            text-shadow: 0 0 5px var(--shadow-color);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--text-color);
+            transition: width 0.3s ease;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        .language-switcher, .theme-toggle {
+            position: relative;
+            display: inline-block;
+        }
+
+        .language-switcher .lang-toggle, .theme-toggle-btn {
+            cursor: pointer;
+            color: var(--secondary-text-color);
+            font-size: 0.95em;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .language-switcher .lang-toggle:hover, .theme-toggle-btn:hover {
+            color: var(--text-color);
+            text-shadow: 0 0 5px var(--shadow-color);
+        }
+
+        .language-switcher .lang-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--nav-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            list-style: none;
+            padding: 10px 0;
+            min-width: 60px;
+            text-align: center;
+            z-index: 11;
+        }
+
+        .language-switcher:hover .lang-list {
+            display: block;
+        }
+
+        .language-switcher .lang-list li {
+            margin: 5px 0;
+        }
+
+        .language-switcher .lang-list button {
+            background: none;
+            border: none;
+            color: var(--secondary-text-color);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            cursor: pointer;
+            padding: 5px 15px;
+            width: 100%;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .language-switcher .lang-list button:hover,
+        .language-switcher .lang-list button.active {
+            background: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .content {
+            padding: 100px 40px 40px;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--text-color);
+            border-radius: 10px;
+            box-shadow: 0 0 25px var(--shadow-color);
+            animation: drawBorder 2s paused forwards;
+            will-change: clip-path;
+        }
+
+        .hero-text h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 5.5em;
+            color: var(--text-color);
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            text-shadow: 0 0 20px var(--shadow-color);
+            margin-bottom: 25px;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.5s, color 0.3s ease, text-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hero-text h1:hover {
+            text-shadow: 0 0 30px var(--shadow-color);
+        }
+
+        .hero-text p {
+            font-size: 1.2em;
+            color: var(--secondary-text-color);
+            max-width: 650px;
+            line-height: 1.5;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.7s;
+        }
+
+        .hero.visible .hero-text h1,
+        .hero.visible .hero-text p {
+            opacity: 1;
+        }
+
+        .section {
+            margin: 80px 0;
+            padding: 35px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            transform: translateZ(0);
+            will-change: transform;
+        }
+
+        .section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 3px solid var(--text-color);
+            border-radius: 10px;
+            box-shadow: 0 0 25px var(--shadow-color);
+            animation: drawBorder 1.5s paused forwards;
+            will-change: clip-path;
+        }
+
+        .section.visible {
+            opacity: 1;
+        }
+
+        .section.visible::before {
+            animation-play-state: running;
+        }
+
+        .section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8em;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-shadow: 0 0 12px var(--shadow-color);
+            opacity: 0;
+            transition: opacity 0.5s ease 0.3s, color 0.3s ease, text-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .section h2:hover {
+            text-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        .section p {
+            font-size: 1em;
+            color: var(--secondary-text-color);
+            margin: 12px 0;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.5s;
+        }
+
+        .section.visible h2,
+        .section.visible p {
+            opacity: 1;
+        }
+
+        .skills-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+            padding: 0 20px;
+        }
+
+        .skill-list {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            gap: 20px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scroll-behavior: smooth;
+            padding: 10px 0;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .skill-list::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .skill-list::-webkit-scrollbar-thumb {
+            background: var(--text-color);
+            border-radius: 4px;
+        }
+
+        .skill-list::-webkit-scrollbar-track {
+            background: var(--border-color);
+        }
+
+        .skill-card {
+            background: var(--skill-card-bg);
+            border: 1px solid var(--secondary-text-color);
+            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            flex-shrink: 0;
+            transform-origin: center;
+            z-index: 1;
+        }
+
+        .skill-card .skill-title {
+            font-size: 1.3em;
+            color: var(--secondary-text-color);
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            text-align: center;
+        }
+
+        .skill-card .skill-details {
+            font-size: 1em;
+            color: #666666;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-top: 0;
+            text-align: center;
+        }
+
+        .skill-card:hover {
+            background: var(--skill-card-hover-bg);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 20px var(--shadow-color);
+            z-index: 2;
+        }
+
+        .skill-card:hover .skill-title {
+            color: var(--skill-card-hover-text);
+        }
+
+        .skill-card:hover .skill-details {
+            color: var(--skill-card-hover-text);
+            max-height: 80px;
+            opacity: 1;
+            margin-top: 10px;
+        }
+
+        .skill-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--shadow-color), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.5s ease;
+            transform: scale(0);
+        }
+
+        .skill-card:hover::before {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .scroll-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: var(--shadow-color);
+            color: var(--secondary-text-color);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            transition: background 0.3s ease;
+            z-index: 2;
+        }
+
+        .scroll-arrow:hover {
+            background: var(--text-color);
+        }
+
+        .scroll-arrow.left {
+            left: 0;
+        }
+
+        .scroll-arrow.right {
+            right: 0;
+        }
+
+        .projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            opacity: 0;
+            transition: opacity 0.5s ease 0.7s;
+            cursor: pointer;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .section.visible .project-card {
+            opacity: 1;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--shadow-color), transparent);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+        }
+
+        .project-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--text-color);
+            border-radius: 8px;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: scale(0.9);
+            box-shadow: 0 0 20px var(--shadow-color);
+        }
+
+        .project-card:hover {
+            transform: translateY(-5px) rotateX(5deg) rotateY(5deg);
+            box-shadow: 0 10px 20px var(--shadow-color);
+            border-color: var(--text-color);
+        }
+
+        .project-card:hover::before {
+            opacity: 1;
+        }
+
+        .project-card:hover::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .project-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            text-shadow: 0 0 8px var(--shadow-color);
+            transition: color 0.3s ease;
+        }
+
+        .project-card p {
+            font-size: 0.95em;
+            color: var(--secondary-text-color);
+            transition: color 0.3s ease;
+        }
+
+        .project-card:hover p {
+            color: var(--text-color);
+        }
+
+        .contact a {
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            display: block;
+            margin: 15px 0;
+            font-size: 1em;
+            transition: color 0.3s ease, transform 0.3s ease, background 0.3s ease, padding 0.3s ease;
+            position: relative;
+            padding: 5px 10px;
+        }
+
+        .contact a:hover {
+            color: var(--bg-color);
+            transform: translateX(10px);
+            background: var(--text-color);
+            text-shadow: 0 0 5px var(--shadow-color);
+            border-radius: 5px;
+        }
+
+        .contact a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--text-color);
+            transition: width 0.3s ease;
+        }
+
+        .contact a:hover::after {
+            width: 100%;
+        }
+
+        footer {
+            padding: 25px;
+            text-align: center;
+            background: var(--nav-bg);
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+            border-top: 1px solid var(--border-color);
+            position: relative;
+            z-index: 1;
+        }
+
+        footer a {
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            margin: 0 12px;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--text-color);
+            text-shadow: 0 0 5px var(--shadow-color);
+        }
+
+        @keyframes drawBorder {
+            0% { clip-path: polygon(0 0, 0 0, 0 0, 0 0); }
+            25% { clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); }
+            50% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+            75% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+            100% { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; flex-direction: column; align-items: flex-start; }
+            nav ul { margin-top: 10px; gap: 20px; flex-wrap: wrap; justify-content: center; }
+            .language-switcher .lang-list { left: 0; transform: none; }
+            .content { padding: 80px 20px 20px; }
+            .hero { min-height: 60vh; padding: 30px; }
+            .hero-text h1 { font-size: 3.5em; }
+            .hero-text p { font-size: 1em; }
+            .section { margin: 60px 0; padding: 25px; }
+            .section h2 { font-size: 2.2em; }
+            .skills-container { padding: 0 10px; }
+            .skill-card { width: 150px; height: 150px; }
+            .projects-container { grid-template-columns: 1fr; }
+            .project-card:hover { transform: translateY(-5px); }
+        }
+
+        @media (max-width: 480px) {
+            nav h1 { font-size: 1.6em; }
+            nav a { font-size: 0.85em; }
+            .content { padding: 70px 15px 15px; }
+            .hero-text h1 { font-size: 2.5em; letter-spacing: 2px; }
+            .hero-text p { font-size: 0.9em; max-width: 100%; }
+            .section h2 { font-size: 1.8em; }
+            .skill-card { width: 120px; height: 120px; }
+            .skill-card .skill-title { font-size: 1.1em; }
+            .skill-card .skill-details { font-size: 0.85em; }
+            .project-card h3 { font-size: 1.3em; }
+            .project-card p { font-size: 0.9em; }
+            .contact a { font-size: 0.9em; margin: 10px 0; }
+            footer { padding: 20px; font-size: 0.85em; }
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--popup-bg);
+            padding: 40px;
+            border: 2px solid var(--text-color);
+            border-radius: 15px;
+            box-shadow: 0 0 30px var(--shadow-color);
+            z-index: 100;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            font-family: 'IBM Plex Mono', monospace;
+            box-sizing: border-box;
+        }
+
+        .popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--text-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .popup h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--text-color);
+            margin: 0;
+            flex: 1;
+            min-width: 0;
+            overflow-wrap: break-word;
+        }
+
+        .popup-close {
+            font-size: 2em;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+            padding: 0 10px;
+        }
+
+        .popup-close:hover {
+            color: #666666;
+        }
+
+        .popup-content {
+            color: var(--secondary-text-color);
+            line-height: 1.6;
+        }
+
+        .popup-content p {
+            font-size: 1.1em;
+            margin: 10px 0;
+        }
+
+        .popup-details {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--popup-details-bg);
+            border-radius: 10px;
+        }
+
+        .popup-details h4 {
+            font-size: 1.3em;
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .popup-details ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .popup-details ul li {
+            font-size: 1em;
+            margin: 8px 0;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .popup-details ul li::before {
+            content: '➜';
+            position: absolute;
+            left: 0;
+            color: var(--text-color);
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-bg);
+            z-index: 99;
+        }
+
+        @media (max-width: 768px) {
+            .popup { padding: 20px; max-width: 90%; max-height: 85vh; }
+            .popup h3 { font-size: 2em; }
+            .popup-close { font-size: 1.8em; }
+            .popup-content p { font-size: 1em; }
+            .popup-details h4 { font-size: 1.2em; }
+            .popup-details ul li { font-size: 0.95em; }
+        }
+
+        @media (max-width: 480px) {
+            .popup { padding: 15px; width: 95%; max-height: 90vh; }
+            .popup-header { flex-direction: column; align-items: flex-start; padding-bottom: 10px; }
+            .popup h3 { font-size: 1.8em; margin-bottom: 10px; }
+            .popup-close { font-size: 1.5em; align-self: flex-end; }
+            .popup-content p { font-size: 0.9em; }
+            .popup-details { padding: 10px; }
+            .popup-details h4 { font-size: 1.1em; }
+            .popup-details ul li { font-size: 0.85em; padding-left: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <nav>
+        <h1 data-en="EELANT" data-jp="EELANT" data-vn="EELANT">EELANT</h1>
+        <ul>
+            <li><a href="#identity" data-en="Identity" data-jp="アイデンティティ" data-vn="Danh tính">Identity</a></li>
+            <li><a href="#purpose" data-en="Purpose" data-jp="目的" data-vn="Mục đích">Purpose</a></li>
+            <li><a href="#skills" data-en="Skills" data-jp="スキル" data-vn="Kỹ năng">Skills</a></li>
+            <li><a href="#works" data-en="Works" data-jp="作品" data-vn="Công việc">Works</a></li>
+            <li><a href="#contact" data-en="Contact" data-jp="連絡先" data-vn="Liên hệ">Contact</a></li>
+            <li class="language-switcher">
+                <span class="lang-toggle" data-en="Language" data-jp="言語" data-vn="Ngôn ngữ">Language</span>
+                <ul class="lang-list">
+                    <li><button class="lang-btn active" data-lang="en">EN</button></li>
+                    <li><button class="lang-btn" data-lang="jp">JP</button></li>
+                    <li><button class="lang-btn" data-lang="vn">VN</button></li>
+                </ul>
+            </li>
+            <li class="theme-toggle">
+                <span class="theme-toggle-btn" id="theme-toggle">Toggle Theme</span>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="content">
+        <section class="hero">
+            <div class="hero-text">
+                <h1 data-en="EELANT" data-jp="EELANT" data-vn="EELANT">EELANT</h1>
+                <p data-en="SERVER ARCHITECT SINCE 2020. INFRASTRUCTURE BENDS TO MY CODE. DEPLOYMENTS RUN THROUGH MY VEINS. WELCOME TO THE CORE."
+                   data-jp="2020年以来のサーバー設計者。インフラは私のコードに従い、デプロイは私の血脈を流れる。コアへようこそ。"
+                   data-vn="KIẾN TRÚC SƯ MÁY CHỦ TỪ NĂM 2020. HẠ TẦNG UỐN THEO MÃ CỦA TÔI. TRIỂN KHAI CHẢY TRONG MẠCH MÁU. CHÀO MỪNG ĐẾN LÕI.">
+                    SERVER ARCHITECT SINCE 2020. INFRASTRUCTURE BENDS TO MY CODE. DEPLOYMENTS RUN THROUGH MY VEINS. WELCOME TO THE CORE.
+                </p>
+            </div>
+        </section>
+
+        <section class="section" id="identity">
+            <h2 data-en="Identity" data-jp="アイデンティティ" data-vn="Danh tính">Identity</h2>
+            <p data-en="Role: Backend Engineer & DevOps Specialist" 
+               data-jp="役割: バックエンドエンジニア & DevOpsスペシャリスト" 
+               data-vn="Vai trò: Kỹ sư Backend & Chuyên gia DevOps">Role: Backend Engineer & DevOps Specialist</p>
+            <p data-en="Location: [Server Cluster Unknown]" 
+               data-jp="場所: [サーバークラスター不明]" 
+               data-vn="Vị trí: [Cụm máy chủ không xác định]">Location: [Server Cluster Unknown]</p>
+            <p data-en="Since: 2020" 
+               data-jp="開始: 2020年" 
+               data-vn="Từ: 2020">Since: 2020</p>
+            <p data-en="Bio: I forge resilient systems and orchestrate chaos into order, one pipeline at a time." 
+               data-jp="経歴: 私は堅牢なシステムを鍛え、パイプラインごとに混沌を秩序に変える。" 
+               data-vn="Tiểu sử: Tôi rèn giũa các hệ thống bền bỉ và điều phối hỗn loạn thành trật tự, từng pipeline một.">Bio: I forge resilient systems and orchestrate chaos into order, one pipeline at a time.</p>
+        </section>
+
+        <section class="section" id="purpose">
+            <h2 data-en="Purpose" data-jp="目的" data-vn="Mục đích">Purpose</h2>
+            <p data-en="Focus: Scalable Backend Systems. Relentless Automation." 
+               data-jp="焦点: スケーラブルなバックエンドシステム。容赦ない自動化。" 
+               data-vn="Tập trung: Hệ thống Backend mở rộng. Tự động hóa không ngừng.">Focus: Scalable Backend Systems. Relentless Automation.</p>
+            <p data-en="Mission: Build infrastructures that defy downtime and scale infinitely." 
+               data-jp="使命: ダウンタイムを拒み、無限にスケールするインフラを構築する。" 
+               data-vn="Sứ mệnh: Xây dựng hạ tầng chống lại thời gian chết và mở rộng vô hạn.">Mission: Build infrastructures that defy downtime and scale infinitely.</p>
+        </section>
+
+        <section class="section" id="skills">
+            <h2 data-en="Skills" data-jp="スキル" data-vn="Kỹ năng">Skills</h2>
+            <div class="skills-container">
+                <button class="scroll-arrow left">←</button>
+                <div class="skill-list">
+                    <div class="skill-card" data-popup="skill1">
+                        <div class="skill-title">Node.js</div>
+                        <div class="skill-details">API, Express, Async</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill2">
+                        <div class="skill-title">Python</div>
+                        <div class="skill-details">Flask, Django, Scripts</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill3">
+                        <div class="skill-title">Docker</div>
+                        <div class="skill-details">Containers, Compose</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill4">
+                        <div class="skill-title">Kubernetes</div>
+                        <div class="skill-details">Orchestration, Helm</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill5">
+                        <div class="skill-title">AWS</div>
+                        <div class="skill-details">EC2, S3, Lambda</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill6">
+                        <div class="skill-title">CI/CD</div>
+                        <div class="skill-details">Jenkins, GitHub Actions</div>
+                    </div>
+                    <div class="skill-card" data-popup="skill7">
+                        <div class="skill-title">PostgreSQL</div>
+                        <div class="skill-details">DB Design, Queries</div>
+                    </div>
+                </div>
+                <button class="scroll-arrow right">→</button>
+            </div>
+        </section>
+
+        <section class="section" id="works">
+            <h2 data-en="Works" data-jp="作品" data-vn="Công việc">Works</h2>
+            <div class="projects-container">
+                <div class="project-card" data-popup="project1">
+                    <h3 data-en="Dark Cluster" data-jp="ダーククラスタ" data-vn="Cụm Tối">Dark Cluster</h3>
+                    <p data-en="A Kubernetes-based microservices deployment with zero downtime." 
+                       data-jp="Kubernetesベースのマイクロサービスデプロイ、ダウンタイムゼロ。" 
+                       data-vn="Triển khai microservices dựa trên Kubernetes với thời gian chết bằng 0.">A Kubernetes-based microservices deployment with zero downtime.</p>
+                </div>
+                <div class="project-card" data-popup="project2">
+                    <h3 data-en="Pipeline Forge" data-jp="パイプラインフォージ" data-vn="Lò Pipeline">Pipeline Forge</h3>
+                    <p data-en="Automated CI/CD pipeline with Jenkins and Docker." 
+                       data-jp="JenkinsとDockerを使用した自動化CI/CDパイプライン。" 
+                       data-vn="Pipeline CI/CD tự động với Jenkins và Docker.">Automated CI/CD pipeline with Jenkins and Docker.</p>
+                </div>
+                <div class="project-card" data-popup="project3">
+                    <h3 data-en="Data Vault" data-jp="データボルト" data-vn="Kho Dữ liệu">Data Vault</h3>
+                    <p data-en="Scalable backend API with Node.js and PostgreSQL." 
+                       data-jp="Node.jsとPostgreSQLを使用したスケーラブルなバックエンドAPI。" 
+                       data-vn="API backend mở rộng với Node.js và PostgreSQL.">Scalable backend API with Node.js and PostgreSQL.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="section contact" id="contact">
+            <h2 data-en="Contact" data-jp="連絡先" data-vn="Liên hệ">Contact</h2>
+            <a href="mailto:[your-email]" data-en="[Encrypted Email]" data-jp="[暗号化メール]" data-vn="[Email mã hóa]">[Encrypted Email]</a>
+            <a href="https://github.com/Eelanteky" target="_blank" data-en="GitHub" data-jp="GitHub" data-vn="GitHub">GitHub</a>
+            <a href="https://www.linkedin.com/in/[your-linkedin]/" target="_blank" data-en="LinkedIn" data-jp="LinkedIn" data-vn="LinkedIn">LinkedIn</a>
+            <a href="https://twitter.com/[your-twitter]" target="_blank" data-en="Twitter" data-jp="Twitter" data-vn="Twitter">Twitter</a>
+        </section>
+
+        <!-- Popups -->
+        <div class="popup-overlay" id="popup-overlay"></div>
+
+        <!-- Skill Popups -->
+        <div class="popup" id="skill1">
+            <div class="popup-header">
+                <h3 data-en="Node.js" data-jp="Node.js" data-vn="Node.js">Node.js</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Expertise in building RESTful APIs with Node.js, leveraging Express for routing, middleware for authentication, and async operations for performance."
+                   data-jp="Node.jsでRESTful APIを構築する専門知識。Expressを使用したルーティング、認証用ミドルウェア、パフォーマンスのための非同期操作。"
+                   data-vn="Chuyên môn xây dựng API RESTful với Node.js, sử dụng Express cho định tuyến, middleware cho xác thực, và thao tác không đồng bộ để tăng hiệu suất.">
+                    Expertise in building RESTful APIs with Node.js, leveraging Express for routing, middleware for authentication, and async operations for performance.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="RESTful API Design" data-jp="RESTful API設計" data-vn="Thiết kế API RESTful">RESTful API Design</li>
+                        <li data-en="Express Framework" data-jp="Expressフレームワーク" data-vn="Khung Express">Express Framework</li>
+                        <li data-en="Async/Await" data-jp="非同期/待機" data-vn="Async/Await">Async/Await</li>
+                        <li data-en="Middleware Integration" data-jp="ミドルウェア統合" data-vn="Tích hợp Middleware">Middleware Integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill2">
+            <div class="popup-header">
+                <h3 data-en="Python" data-jp="Python" data-vn="Python">Python</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Proficient in Python for backend development with Flask and Django, scripting for automation, and integrating with DevOps tools."
+                   data-jp="FlaskとDjangoを使用したバックエンド開発、自動化スクリプト、DevOpsツールとの統合に熟練したPython。"
+                   data-vn="Thành thạo Python cho phát triển backend với Flask và Django, viết script tự động hóa, và tích hợp với công cụ DevOps.">
+                    Proficient in Python for backend development with Flask and Django, scripting for automation, and integrating with DevOps tools.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Flask Microservices" data-jp="Flaskマイクロサービス" data-vn="Microservices Flask">Flask Microservices</li>
+                        <li data-en="Django ORM" data-jp="Django ORM" data-vn="Django ORM">Django ORM</li>
+                        <li data-en="Automation Scripts" data-jp="自動化スクリプト" data-vn="Script tự động hóa">Automation Scripts</li>
+                        <li data-en="API Development" data-jp="API開発" data-vn="Phát triển API">API Development</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill3">
+            <div class="popup-header">
+                <h3 data-en="Docker" data-jp="Docker" data-vn="Docker">Docker</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Skilled in containerization with Docker, creating optimized images, and managing multi-container apps with Docker Compose."
+                   data-jp="Dockerを使用したコンテナ化、最適化されたイメージの作成、Docker Composeによるマルチコンテナアプリの管理に熟練。"
+                   data-vn="Thành thạo container hóa với Docker, tạo hình ảnh tối ưu, và quản lý ứng dụng đa container với Docker Compose.">
+                    Skilled in containerization with Docker, creating optimized images, and managing multi-container apps with Docker Compose.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Containerization" data-jp="コンテナ化" data-vn="Container hóa">Containerization</li>
+                        <li data-en="Docker Compose" data-jp="Docker Compose" data-vn="Docker Compose">Docker Compose</li>
+                        <li data-en="Image Optimization" data-jp="イメージ最適化" data-vn="Tối ưu hóa hình ảnh">Image Optimization</li>
+                        <li data-en="Networking" data-jp="ネットワーキング" data-vn="Mạng">Networking</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill4">
+            <div class="popup-header">
+                <h3 data-en="Kubernetes" data-jp="Kubernetes" data-vn="Kubernetes">Kubernetes</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Experienced in orchestrating containerized apps with Kubernetes, using Helm for deployments, and ensuring high availability."
+                   data-jp="Kubernetesでコンテナ化されたアプリを調整し、Helmを使用してデプロイし、高可用性を確保する経験。"
+                   data-vn="Kinh nghiệm điều phối ứng dụng container với Kubernetes, sử dụng Helm để triển khai, và đảm bảo tính sẵn sàng cao.">
+                    Experienced in orchestrating containerized apps with Kubernetes, using Helm for deployments, and ensuring high availability.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Cluster Management" data-jp="クラスタ管理" data-vn="Quản lý cụm">Cluster Management</li>
+                        <li data-en="Helm Charts" data-jp="Helmチャート" data-vn="Biểu đồ Helm">Helm Charts</li>
+                        <li data-en="Auto-Scaling" data-jp="自動スケーリング" data-vn="Tự động mở rộng">Auto-Scaling</li>
+                        <li data-en="High Availability" data-jp="高可用性" data-vn="Tính sẵn sàng cao">High Availability</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill5">
+            <div class="popup-header">
+                <h3 data-en="AWS" data-jp="AWS" data-vn="AWS">AWS</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Proficient in AWS services for infrastructure management, including EC2, S3, Lambda, and IAM for secure deployments."
+                   data-jp="EC2、S3、Lambda、IAMを使用した安全なデプロイのためのAWSサービスのインフラ管理に熟練。"
+                   data-vn="Thành thạo các dịch vụ AWS để quản lý hạ tầng, bao gồm EC2, S3, Lambda và IAM cho triển khai an toàn.">
+                    Proficient in AWS services for infrastructure management, including EC2, S3, Lambda, and IAM for secure deployments.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="EC2 Instances" data-jp="EC2インスタンス" data-vn="Phiên bản EC2">EC2 Instances</li>
+                        <li data-en="S3 Storage" data-jp="S3ストレージ" data-vn="Lưu trữ S3">S3 Storage</li>
+                        <li data-en="Serverless Lambda" data-jp="サーバーレスLambda" data-vn="Lambda không máy chủ">Serverless Lambda</li>
+                        <li data-en="IAM Security" data-jp="IAMセキュリティ" data-vn="Bảo mật IAM">IAM Security</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill6">
+            <div class="popup-header">
+                <h3 data-en="CI/CD" data-jp="CI/CD" data-vn="CI/CD">CI/CD</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Skilled in automating deployment pipelines with Jenkins and GitHub Actions, ensuring rapid and reliable releases."
+                   data-jp="JenkinsとGitHub Actionsでデプロイパイプラインを自動化し、迅速で信頼性の高いリリースを確保するスキル。"
+                   data-vn="Thành thạo tự động hóa pipeline triển khai với Jenkins và GitHub Actions, đảm bảo phát hành nhanh chóng và đáng tin cậy.">
+                    Skilled in automating deployment pipelines with Jenkins and GitHub Actions, ensuring rapid and reliable releases.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Jenkins Pipelines" data-jp="Jenkinsパイプライン" data-vn="Pipeline Jenkins">Jenkins Pipelines</li>
+                        <li data-en="GitHub Actions" data-jp="GitHub Actions" data-vn="GitHub Actions">GitHub Actions</li>
+                        <li data-en="Automated Testing" data-jp="自動テスト" data-vn="Kiểm thử tự động">Automated Testing</li>
+                        <li data-en="Deployment Automation" data-jp="デプロイ自動化" data-vn="Tự động triển khai">Deployment Automation</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="skill7">
+            <div class="popup-header">
+                <h3 data-en="PostgreSQL" data-jp="PostgreSQL" data-vn="PostgreSQL">PostgreSQL</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="Experienced in designing and optimizing PostgreSQL databases, writing complex queries, and ensuring data integrity."
+                   data-jp="PostgreSQLデータベースの設計と最適化、複雑なクエリの作成、データ整合性の確保の経験。"
+                   data-vn="Kinh nghiệm thiết kế và tối ưu hóa cơ sở dữ liệu PostgreSQL, viết truy vấn phức tạp, và đảm bảo tính toàn vẹn dữ liệu.">
+                    Experienced in designing and optimizing PostgreSQL databases, writing complex queries, and ensuring data integrity.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Schema Design" data-jp="スキーマ設計" data-vn="Thiết kế lược đồ">Schema Design</li>
+                        <li data-en="Complex Queries" data-jp="複雑なクエリ" data-vn="Truy vấn phức tạp">Complex Queries</li>
+                        <li data-en="Indexing" data-jp="インデックス作成" data-vn="Chỉ mục">Indexing</li>
+                        <li data-en="Replication" data-jp="レプリケーション" data-vn="Sao chép">Replication</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Project Popups -->
+        <div class="popup" id="project1">
+            <div class="popup-header">
+                <h3 data-en="Dark Cluster" data-jp="ダーククラスタ" data-vn="Cụm Tối">Dark Cluster</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="A Kubernetes deployment managing microservices with auto-scaling and zero-downtime updates, hosted on AWS."
+                   data-jp="AWS上でホストされる、自動スケーリングとゼロダウンタイム更新を備えたマイクロサービスを管理するKubernetesデプロイ。"
+                   data-vn="Triển khai Kubernetes quản lý microservices với tự động mở rộng và cập nhật không thời gian chết, được lưu trữ trên AWS.">
+                    A Kubernetes deployment managing microservices with auto-scaling and zero-downtime updates, hosted on AWS.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Microservices Architecture" data-jp="マイクロサービスアーキテクチャ" data-vn="Kiến trúc Microservices">Microservices Architecture</li>
+                        <li data-en="Auto-Scaling" data-jp="自動スケーリング" data-vn="Tự động mở rộng">Auto-Scaling</li>
+                        <li data-en="Zero Downtime" data-jp="ゼロダウンタイム" data-vn="Không thời gian chết">Zero Downtime</li>
+                        <li data-en="AWS Integration" data-jp="AWS統合" data-vn="Tích hợp AWS">AWS Integration</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="project2">
+            <div class="popup-header">
+                <h3 data-en="Pipeline Forge" data-jp="パイプラインフォージ" data-vn="Lò Pipeline">Pipeline Forge</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="A CI/CD pipeline automating builds, tests, and deployments using Jenkins, Docker, and GitHub Actions."
+                   data-jp="Jenkins、Docker、GitHub Actionsを使用したビルド、テスト、デプロイを自動化するCI/CDパイプライン。"
+                   data-vn="Pipeline CI/CD tự động hóa xây dựng, kiểm thử và triển khai bằng Jenkins, Docker và GitHub Actions.">
+                    A CI/CD pipeline automating builds, tests, and deployments using Jenkins, Docker, and GitHub Actions.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="Automated Builds" data-jp="自動ビルド" data-vn="Xây dựng tự động">Automated Builds</li>
+                        <li data-en="Unit Testing" data-jp="ユニットテスト" data-vn="Kiểm thử đơn vị">Unit Testing</li>
+                        <li data-en="Dockerized Deployment" data-jp="Docker化デプロイ" data-vn="Triển khai Docker hóa">Dockerized Deployment</li>
+                        <li data-en="Multi-Stage Pipeline" data-jp="マルチステージパイプライン" data-vn="Pipeline đa giai đoạn">Multi-Stage Pipeline</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="popup" id="project3">
+            <div class="popup-header">
+                <h3 data-en="Data Vault" data-jp="データボルト" data-vn="Kho Dữ liệu">Data Vault</h3>
+                <button class="popup-close">×</button>
+            </div>
+            <div class="popup-content">
+                <p data-en="A scalable REST API backend with Node.js, PostgreSQL, and Redis for caching, deployed on AWS."
+                   data-jp="Node.js、PostgreSQL、Redisを使用したスケーラブルなREST APIバックエンド、キャッシュ用にAWSにデプロイ。"
+                   data-vn="Backend API REST mở rộng với Node.js, PostgreSQL và Redis để lưu trữ đệm, triển khai trên AWS.">
+                    A scalable REST API backend with Node.js, PostgreSQL, and Redis for caching, deployed on AWS.
+                </p>
+                <div class="popup-details">
+                    <h4 data-en="Key Features" data-jp="主な特徴" data-vn="Tính năng chính">Key Features</h4>
+                    <ul>
+                        <li data-en="RESTful Endpoints" data-jp="RESTfulエンドポイント" data-vn="Điểm cuối RESTful">RESTful Endpoints</li>
+                        <li data-en="Database Optimization" data-jp="データベース最適化" data-vn="Tối ưu hóa cơ sở dữ liệu">Database Optimization</li>
+                        <li data-en="Redis Caching" data-jp="Redisキャッシュ" data-vn="Lưu trữ đệm Redis">Redis Caching</li>
+                        <li data-en="AWS Deployment" data-jp="AWSデプロイ" data-vn="Triển khai AWS">AWS Deployment</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p data-en="© 2025 EELANT | CORE ONLINE" data-jp="© 2025 EELANT | コアオンライン" data-vn="© 2025 EELANT | LÕI TRỰC TUYẾN">© 2025 EELANT | CORE ONLINE</p>
+        <p>
+            <a href="#top" data-en="Reboot" data-jp="リブート" data-vn="Khởi động lại">Reboot</a> | 
+            <a href="mailto:[your-email]" data-en="Ping" data-jp="ピン" data-vn="Ping">Ping</a> | 
+            <a href="https://github.com/Eelanteky" data-en="Source" data-jp="ソース" data-vn="Nguồn">Source</a>
+        </p>
+    </footer>
+
+    <script>
+        // Matrix Background
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%';
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        function drawMatrix() {
+            ctx.fillStyle = document.body.dataset.theme === 'dark' ? 'rgba(13, 13, 13, 0.06)' : 'rgba(240, 240, 240, 0.06)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = document.body.dataset.theme === 'dark' ? '#00ffcc' : '#000000';
+            ctx.font = `${fontSize}px 'IBM Plex Mono'`;
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = characters.charAt(Math.floor(Math.random() * characters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 50);
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            drawMatrix(); // Redraw on resize to ensure full coverage
+        });
+
+        // Smooth Scroll for Navigation
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                if (targetElement) {
+                    const navbarHeight = document.querySelector('nav').offsetHeight;
+                    const targetPosition = targetElement.getBoundingClientRect().top + window.scrollY - navbarHeight - 20;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for Drawing Animation
+        const sections = document.querySelectorAll('.hero, .section');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    const before = entry.target.querySelector('::before');
+                    if (before) {
+                        before.style.animationPlayState = 'running';
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(section => observer.observe(section));
+
+        // Skill List Scroll Buttons
+        const skillList = document.querySelector('.skill-list');
+        const scrollLeftBtn = document.querySelector('.scroll-arrow.left');
+        const scrollRightBtn = document.querySelector('.scroll-arrow.right');
+
+        scrollLeftBtn.addEventListener('click', () => {
+            skillList.scrollBy({ left: -360, behavior: 'smooth' });
+        });
+
+        scrollRightBtn.addEventListener('click', () => {
+            skillList.scrollBy({ left: 360, behavior: 'smooth' });
+        });
+
+        function updateArrows() {
+            const maxScroll = skillList.scrollWidth - skillList.clientWidth;
+            scrollLeftBtn.style.opacity = skillList.scrollLeft > 0 ? '1' : '0.3';
+            scrollRightBtn.style.opacity = skillList.scrollLeft < maxScroll ? '1' : '0.3';
+        }
+
+        skillList.addEventListener('scroll', updateArrows);
+        window.addEventListener('resize', updateArrows);
+        updateArrows();
+
+        // Popup Functionality
+        const overlay = document.getElementById('popup-overlay');
+        const skillCards = document.querySelectorAll('.skill-card');
+        const projectCards = document.querySelectorAll('.project-card');
+        const closeButtons = document.querySelectorAll('.popup-close');
+
+        function openPopup(popupId) {
+            const popup = document.getElementById(popupId);
+            popup.style.display = 'block';
+            overlay.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePopup() {
+            document.querySelectorAll('.popup').forEach(popup => {
+                popup.style.display = 'none';
+            });
+            overlay.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        skillCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const popupId = card.getAttribute('data-popup');
+                openPopup(popupId);
+            });
+        });
+
+        projectCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const popupId = card.getAttribute('data-popup');
+                openPopup(popupId);
+            });
+        });
+
+        closeButtons.forEach(button => {
+            button.addEventListener('click', closePopup);
+        });
+
+        overlay.addEventListener('click', closePopup);
+
+        // Skill Card Hover Effects
+        skillCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                const mouseX = e.clientX - cardCenterX;
+                const mouseY = e.clientY - cardCenterY;
+
+                const translateX = (mouseX / rect.width) * 20;
+                const translateY = (mouseY / rect.height) * 20;
+
+                card.style.transform = `translateY(-5px) scale(1.05) translate(${translateX}px, ${translateY}px)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px) scale(1.05)';
+            });
+        });
+
+        // Project Card Hover Effects
+        const projectCardsHover = document.querySelectorAll('.project-card');
+        projectCardsHover.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const cardCenterX = rect.left + rect.width / 2;
+                const cardCenterY = rect.top + rect.height / 2;
+                const mouseX = e.clientX - cardCenterX;
+                const mouseY = e.clientY - cardCenterY;
+
+                const rotateX = (mouseY / rect.height) * -10;
+                const rotateY = (mouseX / rect.width) * 10;
+
+                card.style.transform = `translateY(-5px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            });
+
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Parallax Scrolling Animation (Only for Content, Not Background)
+        function updateParallax() {
+            const scrollY = window.scrollY;
+            const hero = document.querySelector('.hero');
+            const sections = document.querySelectorAll('.section');
+
+            const tiltAngle = scrollY * 0.02;
+            hero.style.transform = `rotateX(${tiltAngle * 0.3}deg) translateY(${scrollY * 0.05}px)`;
+            sections.forEach((section, index) => {
+                const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+                const offsetY = (scrollY - sectionTop) * 0.04;
+                const sectionTilt = (scrollY - sectionTop) * 0.01;
+                section.style.transform = `rotateX(${sectionTilt}deg) translateY(${offsetY}px)`;
+            });
+        }
+
+        window.addEventListener('scroll', updateParallax);
+        window.addEventListener('resize', updateParallax);
+        updateParallax();
+
+        // Language Switcher
+        const langButtons = document.querySelectorAll('.lang-btn');
+        const translatableElements = document.querySelectorAll('[data-en][data-jp][data-vn]');
+
+        function changeLanguage(lang) {
+            translatableElements.forEach(element => {
+                element.textContent = element.getAttribute(`data-${lang}`);
+            });
+            langButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+            document.documentElement.lang = lang;
+        }
+
+        langButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const lang = button.getAttribute('data-lang');
+                changeLanguage(lang);
+            });
+        });
+
+        // Theme Toggle
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        function setTheme(theme) {
+            document.body.dataset.theme = theme;
+            localStorage.setItem('theme', theme);
+            themeToggleBtn.textContent = theme === 'dark' ? 'Light Mode' : 'Dark Mode';
+            drawMatrix();
+        }
+
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.body.dataset.theme === 'dark' ? 'dark' : 'light';
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            setTheme(newTheme);
+        });
+
+        // Set default language
+        changeLanguage('en');
+    </script>
+</body>
+</html>
